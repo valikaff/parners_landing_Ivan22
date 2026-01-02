@@ -1,7 +1,9 @@
 // Country detection and mapping to languages
 const countryToLanguage = {
     // English speaking countries
-    'US': 'en', 'GB': 'en', 'AU': 'en', 'CA': 'en', 'NZ': 'en', 'IE': 'en', 'NG': 'en', 'ZA': 'en',
+    'US': 'en', 'GB': 'en', 'AU': 'en', 'CA': 'en', 'NZ': 'en', 'IE': 'en', 'NG': 'en',
+    // South Africa (uses English but ZAR currency)
+    'ZA': 'za',
     // Russian
     'RU': 'ru',
     // Spanish speaking countries
