@@ -30,8 +30,8 @@ const countryToLanguage = {
     'ID': 'id',
     // Hindi
     'IN': 'hi',
-    // Urdu
-    'PK': 'ur',
+    // Pakistan (uses English with PKR currency)
+    'PK': 'pk',
     // Malay
     'MY': 'ms', 'SG': 'ms',
     // Thai

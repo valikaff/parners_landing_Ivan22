@@ -52,7 +52,8 @@ document.addEventListener('DOMContentLoaded', function() {
             fi: { minute: 'minuutti', minutes: 'minuuttia', second: 'sekunti', seconds: 'sekuntia' },
             he: { minute: 'דקה', minutes: 'דקות', second: 'שנייה', seconds: 'שניות' },
             za: { minute: 'minute', minutes: 'minutes', second: 'second', seconds: 'seconds' },
-            ng: { minute: 'minute', minutes: 'minutes', second: 'second', seconds: 'seconds' }
+            ng: { minute: 'minute', minutes: 'minutes', second: 'second', seconds: 'seconds' },
+            pk: { minute: 'minute', minutes: 'minutes', second: 'second', seconds: 'seconds' }
         };
         return translations[lang] || translations.en;
     }
