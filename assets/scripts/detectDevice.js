@@ -25,19 +25,13 @@ function getDeviceName() {
     return "your device"; 
 }
 
-document.addEventListener("DOMContentLoaded", async function () {
+document.addEventListener("DOMContentLoaded", function () {
     const deviceName = getDeviceName();
     const elements = document.querySelectorAll('.device-name');
 
     elements.forEach(el => {
         el.textContent = deviceName;
     });
-
-    // Trigger translation update if i18n is loaded (wait a bit for i18n to initialize)
-    setTimeout(async function() {
-        if (window.setLanguage && window.getCurrentLanguage) {
-            const currentLang = window.getCurrentLanguage();
-            await window.setLanguage(currentLang);
-        }
-    }, 200);
+    
+    // i18n.js сам обновит device-name при применении переводов
 });

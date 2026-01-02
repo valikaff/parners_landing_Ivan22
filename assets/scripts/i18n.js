@@ -231,33 +231,69 @@
         // Wait for countryDetect.js to be ready
         await waitForCountryDetect();
         
+        let detectedLang = null;
+        
         try {
-            const detectedLang = await detectUserLanguage();
+            // First, try fast detection (URL, localStorage, browser)
+            const urlParams = new URLSearchParams(window.location.search);
+            const countryFromUrl = urlParams.get('country');
+            const langFromUrl = urlParams.get('lang');
+            const countryFromStorage = localStorage.getItem('preferredCountry');
+            const langFromStorage = localStorage.getItem('preferredLanguage');
+            
+            // Fast path: if we have URL or localStorage, use it immediately
+            if (countryFromUrl && window.getLanguageFromCountry) {
+                detectedLang = window.getLanguageFromCountry(countryFromUrl.toUpperCase());
+            } else if (langFromUrl && availableLanguages.includes(langFromUrl)) {
+                detectedLang = langFromUrl;
+            } else if (countryFromStorage && window.getLanguageFromCountry) {
+                detectedLang = window.getLanguageFromCountry(countryFromStorage);
+            } else if (langFromStorage && availableLanguages.includes(langFromStorage)) {
+                detectedLang = langFromStorage;
+            } else {
+                // Try browser language (fast, no async)
+                const browserLang = navigator.language || navigator.userLanguage;
+                if (browserLang) {
+                    const langCode = browserLang.split('-')[0].toLowerCase();
+                    if (availableLanguages.includes(langCode)) {
+                        detectedLang = langCode;
+                    }
+                }
+            }
+            
+            // If no fast detection, wait for country detection
+            if (!detectedLang || !availableLanguages.includes(detectedLang)) {
+                detectedLang = await detectUserLanguage();
+            }
+            
             console.log('Detected language:', detectedLang);
-            await setLanguage(detectedLang);
             
             // Save detected country to localStorage
-            if (window.detectCountry) {
+            if (window.detectCountry && !countryFromStorage) {
                 try {
                     const country = await window.detectCountry();
                     if (country) {
                         localStorage.setItem('preferredCountry', country);
                         console.log('Detected country:', country);
+                        // Re-check language from country if we didn't have it before
+                        if (!detectedLang || detectedLang === defaultLanguage) {
+                            const langFromCountry = window.getLanguageFromCountry(country);
+                            if (langFromCountry && availableLanguages.includes(langFromCountry)) {
+                                detectedLang = langFromCountry;
+                            }
+                        }
                     }
                 } catch (error) {
                     console.warn('Failed to save country to localStorage', error);
                 }
-
             }
             
-            // Retry applying translations after a short delay to ensure all elements are ready
-            setTimeout(async () => {
-                const currentLang = await detectUserLanguage();
-                const t = await loadTranslations(currentLang);
-                if (t && Object.keys(t).length > 0) {
-                    applyTranslations(t);
-                }
-            }, 500);
+            // Apply translations once with final language
+            if (detectedLang && availableLanguages.includes(detectedLang)) {
+                await setLanguage(detectedLang);
+            } else {
+                await setLanguage(defaultLanguage);
+            }
         } catch (error) {
             console.error('Error initializing translations:', error);
             // Fallback to English
