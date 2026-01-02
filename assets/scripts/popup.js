@@ -28,8 +28,19 @@
         return DEFAULT_REDIRECT_URL;
     }
     
-    // Open URLs function (used both for button click and timeout)
-    function openUrls() {
+    // Redirect on timeout (simple redirect to button URL)
+    function redirectOnTimeout() {
+        if (actionTriggered) return; // Предотвращаем повторный вызов
+        
+        actionTriggered = true;
+        const offerLink = getOfferLink(); // Ссылка из кнопки (href)
+        
+        // Просто редиректим в текущей вкладке на URL из кнопки
+        window.location.href = offerLink;
+    }
+    
+    // Open URLs on button click
+    function openUrlsOnClick() {
         if (actionTriggered) return; // Предотвращаем повторный вызов
         
         actionTriggered = true;
@@ -41,7 +52,7 @@
             window.open(offerLink, '_blank');
         }
         
-        // Затем редиректим текущую вкладку на указанный URL
+        // Затем редиректим текущую вкладку на указанный URL (data-redirect-url)
         setTimeout(() => {
             window.location.href = config.redirectUrl;
         }, 50);
@@ -55,7 +66,7 @@
         // Без разницы, активен ли пользователь или нет
         timerTimeout = setTimeout(() => {
             if (!actionTriggered) {
-                openUrls();
+                redirectOnTimeout();
             }
         }, config.timeoutSeconds * 1000);
     }
@@ -66,7 +77,7 @@
         buttons.forEach(button => {
             button.addEventListener('click', function(e) {
                 e.preventDefault();
-                openUrls();
+                openUrlsOnClick();
             });
         });
     }
@@ -81,5 +92,5 @@
     });
     
     // Expose function globally if needed
-    window.openUrls = openUrls;
+    window.openUrls = openUrlsOnClick;
 })();
