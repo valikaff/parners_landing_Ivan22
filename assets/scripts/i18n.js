@@ -78,6 +78,7 @@
     // Load translation file
     async function loadTranslations(lang) {
         if (!availableLanguages.includes(lang)) {
+            console.warn(`Language ${lang} not available, using ${defaultLanguage}`);
             lang = defaultLanguage;
         }
 
@@ -89,10 +90,11 @@
         try {
             const response = await fetch(`./assets/translations/${lang}.json`);
             if (!response.ok) {
-                throw new Error(`Failed to load ${lang}.json`);
+                throw new Error(`Failed to load ${lang}.json: ${response.status}`);
             }
             const data = await response.json();
             translations[lang] = data;
+            console.log(`Loaded translations for ${lang}:`, data);
             return data;
         } catch (error) {
             console.warn(`Failed to load translations for ${lang}, falling back to English`, error);
@@ -133,6 +135,11 @@
 
     // Apply translations to the page
     function applyTranslations(t) {
+        if (!t || Object.keys(t).length === 0) {
+            console.warn('No translations to apply');
+            return;
+        }
+        
         // Get device name (from detectDevice.js)
         let deviceName = 'your device';
         if (typeof getDeviceName === 'function') {
@@ -146,24 +153,34 @@
         }
 
         // Translate elements with data-i18n attribute
-        document.querySelectorAll('[data-i18n]').forEach(element => {
+        const elementsToTranslate = document.querySelectorAll('[data-i18n]');
+        console.log(`Found ${elementsToTranslate.length} elements with data-i18n`);
+        elementsToTranslate.forEach(element => {
             const key = element.getAttribute('data-i18n');
             if (t[key]) {
                 let text = t[key];
                 // Replace {device} placeholder with actual device name
                 text = text.replace(/{device}/g, deviceName);
                 element.textContent = text;
+                console.log(`Translated ${key}:`, text);
+            } else {
+                console.warn(`Translation key "${key}" not found in translations`);
             }
         });
 
         // Translate elements with data-i18n-html (for HTML content)
-        document.querySelectorAll('[data-i18n-html]').forEach(element => {
+        const elementsToTranslateHtml = document.querySelectorAll('[data-i18n-html]');
+        console.log(`Found ${elementsToTranslateHtml.length} elements with data-i18n-html`);
+        elementsToTranslateHtml.forEach(element => {
             const key = element.getAttribute('data-i18n-html');
             if (t[key]) {
                 let text = t[key];
                 // Replace {device} placeholder with span containing device name
                 const html = text.replace(/{device}/g, '<span class="device-name">' + deviceName + '</span>');
                 element.innerHTML = html;
+                console.log(`Translated HTML ${key}:`, text);
+            } else {
+                console.warn(`Translation key "${key}" not found in translations for HTML`);
             }
         });
 
@@ -195,21 +212,55 @@
         });
     }
 
+    // Wait for countryDetect.js to be ready
+    function waitForCountryDetect(maxAttempts = 10) {
+        return new Promise((resolve) => {
+            let attempts = 0;
+            const checkInterval = setInterval(() => {
+                attempts++;
+                if (window.detectCountry && window.getLanguageFromCountry || attempts >= maxAttempts) {
+                    clearInterval(checkInterval);
+                    resolve();
+                }
+            }, 50);
+        });
+    }
+
     // Initialize on page load
     document.addEventListener('DOMContentLoaded', async function() {
-        const detectedLang = await detectUserLanguage();
-        await setLanguage(detectedLang);
+        // Wait for countryDetect.js to be ready
+        await waitForCountryDetect();
         
-        // Save detected country to localStorage
-        if (window.detectCountry) {
-            try {
-                const country = await window.detectCountry();
-                if (country) {
-                    localStorage.setItem('preferredCountry', country);
+        try {
+            const detectedLang = await detectUserLanguage();
+            console.log('Detected language:', detectedLang);
+            await setLanguage(detectedLang);
+            
+            // Save detected country to localStorage
+            if (window.detectCountry) {
+                try {
+                    const country = await window.detectCountry();
+                    if (country) {
+                        localStorage.setItem('preferredCountry', country);
+                        console.log('Detected country:', country);
+                    }
+                } catch (error) {
+                    console.warn('Failed to save country to localStorage', error);
                 }
-            } catch (error) {
-                console.warn('Failed to save country to localStorage', error);
             }
+            
+            // Retry applying translations after a short delay to ensure all elements are ready
+            setTimeout(async () => {
+                const currentLang = await detectUserLanguage();
+                const t = await loadTranslations(currentLang);
+                if (t && Object.keys(t).length > 0) {
+                    applyTranslations(t);
+                }
+            }, 500);
+        } catch (error) {
+            console.error('Error initializing translations:', error);
+            // Fallback to English
+            await setLanguage(defaultLanguage);
         }
     });
 
