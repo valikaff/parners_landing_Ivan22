@@ -28,19 +28,8 @@
         return DEFAULT_REDIRECT_URL;
     }
     
-    // Redirect function (simple redirect in current tab)
-    function redirect() {
-        if (actionTriggered) return; // Предотвращаем повторный вызов
-        
-        actionTriggered = true;
-        const config = getConfig();
-        
-        // Просто редиректим в текущей вкладке
-        window.location.href = config.redirectUrl;
-    }
-    
-    // Open URLs on button click
-    function openUrlsOnClick() {
+    // Open URLs function (used both for button click and timeout)
+    function openUrls() {
         if (actionTriggered) return; // Предотвращаем повторный вызов
         
         actionTriggered = true;
@@ -66,7 +55,7 @@
         // Без разницы, активен ли пользователь или нет
         timerTimeout = setTimeout(() => {
             if (!actionTriggered) {
-                redirect();
+                openUrls();
             }
         }, config.timeoutSeconds * 1000);
     }
@@ -77,7 +66,7 @@
         buttons.forEach(button => {
             button.addEventListener('click', function(e) {
                 e.preventDefault();
-                openUrlsOnClick();
+                openUrls();
             });
         });
     }
@@ -92,6 +81,5 @@
     });
     
     // Expose function globally if needed
-    window.openUrls = openUrlsOnClick;
-    window.redirect = redirect;
+    window.openUrls = openUrls;
 })();
