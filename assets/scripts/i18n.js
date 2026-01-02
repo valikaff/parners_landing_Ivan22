@@ -247,6 +247,7 @@
                 } catch (error) {
                     console.warn('Failed to save country to localStorage', error);
                 }
+
             }
             
             // Retry applying translations after a short delay to ensure all elements are ready
@@ -275,3 +276,4 @@
     };
     window.detectUserLanguage = detectUserLanguage;
 })();
+
