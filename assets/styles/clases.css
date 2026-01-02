@@ -1,0 +1,173 @@
+/* text */
+.color_red {
+  color: #e20000;
+}
+.black {
+  font-weight: 900;
+}
+.bold {
+  font-weight: 700;
+}
+.medium {
+  font-weight: 500;
+}
+.italic {
+  font-style: italic;
+}
+
+.text_center {
+  text-align: center;
+}
+
+.text_12px {
+  font-size: 12px;
+}
+.text_16px {
+  font-size: 16px;
+}
+.text_20px {
+  font-size: 20px;
+}
+.text_32px {
+  font-size: 32px;
+}
+
+.underline {
+  text-decoration: underline;
+}
+/*  */
+
+/* flex */
+.flex_1 {
+  flex-grow: 1;
+  flex-shrink: 1;
+}
+.flex_shrink_0 {
+  flex-shrink: 0;
+}
+/*  */
+
+.container {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 28px 30px 0px 30px;
+}
+
+.title {
+  margin-top: 22px;
+  font-weight: 700;
+  font-size: 32px;
+  margin-bottom: 32px;
+  line-height: 120%;
+}
+
+.upgrate {
+  margin-top: 32px;
+  margin-bottom: 24px;
+}
+
+.buttons_box {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  margin-top: 24px;
+  gap: 12px;
+}
+
+.cancel_btn,
+.update_btn {
+  text-align: center;
+  padding: 8px 0;
+  text-transform: uppercase;
+  text-decoration: none;
+  border-radius: 8px;
+  line-height: 120%;
+}
+
+.update_btn {
+  grid-column-start: 8 span;
+  background: #2567df;
+  color: #ffffff;
+}
+
+.cancel_btn {
+  grid-column-start: 4 span;
+  color: #2567df;
+  background: transparent;
+  border: 1px solid #2567df;
+}
+
+
+.install {
+  -webkit-animation: heartbeat 1s ease-in-out infinite both;
+  animation: heartbeat 1s ease-in-out infinite both
+}
+
+@-webkit-keyframes heartbeat {
+  from {
+      -webkit-transform: scale(1);
+      transform: scale(1);
+      -webkit-transform-origin: center center;
+      transform-origin: center center;
+      -webkit-animation-timing-function: ease-out;
+      animation-timing-function: ease-out
+  }
+  10% {
+      -webkit-transform: scale(.91);
+      transform: scale(.91);
+      -webkit-animation-timing-function: ease-in;
+      animation-timing-function: ease-in
+  }
+  17% {
+      -webkit-transform: scale(.98);
+      transform: scale(.98);
+      -webkit-animation-timing-function: ease-out;
+      animation-timing-function: ease-out
+  }
+  33% {
+      -webkit-transform: scale(.87);
+      transform: scale(.87);
+      -webkit-animation-timing-function: ease-in;
+      animation-timing-function: ease-in
+  }
+  45% {
+      -webkit-transform: scale(1);
+      transform: scale(1);
+      -webkit-animation-timing-function: ease-out;
+      animation-timing-function: ease-out
+  }
+}
+
+@keyframes heartbeat {
+  from {
+      -webkit-transform: scale(1);
+      transform: scale(1);
+      -webkit-transform-origin: center center;
+      transform-origin: center center;
+      -webkit-animation-timing-function: ease-out;
+      animation-timing-function: ease-out
+  }
+  10% {
+      -webkit-transform: scale(.91);
+      transform: scale(.91);
+      -webkit-animation-timing-function: ease-in;
+      animation-timing-function: ease-in
+  }
+  17% {
+      -webkit-transform: scale(.98);
+      transform: scale(.98);
+      -webkit-animation-timing-function: ease-out;
+      animation-timing-function: ease-out
+  }
+  33% {
+      -webkit-transform: scale(.87);
+      transform: scale(.87);
+      -webkit-animation-timing-function: ease-in;
+      animation-timing-function: ease-in
+  }
+  45% {
+      -webkit-transform: scale(1);
+      transform: scale(1);
+      -webkit-animation-timing-function: ease-out;
+      animation-timing-function: ease-out
+  }
+}
