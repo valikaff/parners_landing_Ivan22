@@ -7,8 +7,12 @@ document.addEventListener('DOMContentLoaded', function() {
     let totalSeconds = 4 * 60 + 59;
 
     // Get translations for time units
-    function getTimeTranslations() {
-        const lang = window.getCurrentLanguage ? window.getCurrentLanguage() : 'en';
+    async function getTimeTranslations() {
+        let lang = 'en';
+        if (window.getCurrentLanguage) {
+            const currentLang = await window.getCurrentLanguage();
+            lang = currentLang || 'en';
+        }
         const translations = {
             en: { minute: 'minute', minutes: 'minutes', second: 'second', seconds: 'seconds' },
             ru: { minute: 'минута', minutes: 'минуты', second: 'секунда', seconds: 'секунды' },
@@ -28,6 +32,7 @@ document.addEventListener('DOMContentLoaded', function() {
             th: { minute: 'นาที', minutes: 'นาที', second: 'วินาที', seconds: 'วินาที' },
             ar: { minute: 'دقيقة', minutes: 'دقائق', second: 'ثانية', seconds: 'ثواني' },
             km: { minute: 'នាទី', minutes: 'នាទី', second: 'វិនាទី', seconds: 'វិនាទី' },
+            my: { minute: 'မိနစ်', minutes: 'မိနစ်', second: 'စက္ကန့်', seconds: 'စက္ကန့်' },
             fa: { minute: 'دقیقه', minutes: 'دقیقه', second: 'ثانیه', seconds: 'ثانیه' },
             fil: { minute: 'minuto', minutes: 'minuto', second: 'segundo', seconds: 'segundo' },
             zh: { minute: '分钟', minutes: '分钟', second: '秒', seconds: '秒' },
@@ -50,10 +55,10 @@ document.addEventListener('DOMContentLoaded', function() {
         return translations[lang] || translations.en;
     }
 
-    function updateCountdown() {
+    async function updateCountdown() {
         const minutes = Math.floor(totalSeconds / 60);
         const seconds = totalSeconds % 60;
-        const t = getTimeTranslations();
+        const t = await getTimeTranslations();
         
         // Format: "X minutes Y seconds" or "X minute Y second" (singular)
         let text = '';
@@ -68,9 +73,9 @@ document.addEventListener('DOMContentLoaded', function() {
         
         if (totalSeconds > 0) {
             totalSeconds--;
-            setTimeout(updateCountdown, 1000);
+            setTimeout(() => updateCountdown(), 1000);
         } else {
-            const t = getTimeTranslations();
+            const t = await getTimeTranslations();
             countdownElement.textContent = '0 ' + t.seconds;
         }
     }

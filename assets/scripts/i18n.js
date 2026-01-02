@@ -1,27 +1,59 @@
 // Internationalization script with automatic language detection
 (function() {
     let translations = {};
-    const availableLanguages = ['en', 'ru', 'es', 'de', 'fr', 'it', 'pt', 'bn', 'uk', 'uz', 'kk', 'id', 'hi', 'ur', 'ms', 'th', 'ar', 'km', 'fa', 'fil', 'zh', 'ja', 'tr', 'vi', 'ko', 'pl', 'nl', 'ro', 'el', 'cs', 'hu', 'sv', 'no', 'da', 'fi', 'he'];
+    const availableLanguages = ['en', 'ru', 'es', 'de', 'fr', 'it', 'pt', 'bn', 'uk', 'uz', 'kk', 'id', 'hi', 'ur', 'ms', 'th', 'ar', 'km', 'my', 'fa', 'fil', 'zh', 'ja', 'tr', 'vi', 'ko', 'pl', 'nl', 'ro', 'el', 'cs', 'hu', 'sv', 'no', 'da', 'fi', 'he'];
     const defaultLanguage = 'en';
 
-    // Detect user's preferred language
-    function detectUserLanguage() {
-        // 1. Check URL parameter
+    // Detect user's preferred language (now based on country)
+    async function detectUserLanguage() {
+        // 1. Check URL parameter for country (highest priority)
         const urlParams = new URLSearchParams(window.location.search);
+        const countryFromUrl = urlParams.get('country');
+        if (countryFromUrl && window.getLanguageFromCountry) {
+            const lang = window.getLanguageFromCountry(countryFromUrl.toUpperCase());
+            if (lang && availableLanguages.includes(lang)) {
+                return lang;
+            }
+        }
+        
+        // 2. Check URL parameter for language (backward compatibility)
         const langFromUrl = urlParams.get('lang');
         if (langFromUrl && availableLanguages.includes(langFromUrl)) {
             return langFromUrl;
         }
 
-        // 2. Check localStorage
+        // 3. Check localStorage for country
+        const countryFromStorage = localStorage.getItem('preferredCountry');
+        if (countryFromStorage && window.getLanguageFromCountry) {
+            const lang = window.getLanguageFromCountry(countryFromStorage);
+            if (lang && availableLanguages.includes(lang)) {
+                return lang;
+            }
+        }
+
+        // 4. Check localStorage for language (backward compatibility)
         const langFromStorage = localStorage.getItem('preferredLanguage');
         if (langFromStorage && availableLanguages.includes(langFromStorage)) {
             return langFromStorage;
         }
 
-        // 3. Detect from browser language
+        // 5. Detect country and get language from it
+        if (window.detectCountry) {
+            try {
+                const country = await window.detectCountry();
+                if (country && window.getLanguageFromCountry) {
+                    const lang = window.getLanguageFromCountry(country);
+                    if (lang && availableLanguages.includes(lang)) {
+                        return lang;
+                    }
+                }
+            } catch (error) {
+                console.warn('Failed to detect country, falling back to language detection', error);
+            }
+        }
+
+        // 6. Fallback: Detect from browser language
         const browserLang = navigator.language || navigator.userLanguage;
-        // Try full language code first (e.g., 'ru-RU')
         if (browserLang) {
             const langCode = browserLang.split('-')[0].toLowerCase();
             if (availableLanguages.includes(langCode)) {
@@ -29,7 +61,7 @@
             }
         }
 
-        // 4. Try navigator.languages array (more accurate)
+        // 7. Try navigator.languages array (more accurate)
         if (navigator.languages && navigator.languages.length > 0) {
             for (let i = 0; i < navigator.languages.length; i++) {
                 const lang = navigator.languages[i].split('-')[0].toLowerCase();
@@ -39,7 +71,7 @@
             }
         }
 
-        // 5. Default to English
+        // 8. Default to English
         return defaultLanguage;
     }
 
@@ -165,14 +197,30 @@
 
     // Initialize on page load
     document.addEventListener('DOMContentLoaded', async function() {
-        const detectedLang = detectUserLanguage();
+        const detectedLang = await detectUserLanguage();
         await setLanguage(detectedLang);
+        
+        // Save detected country to localStorage
+        if (window.detectCountry) {
+            try {
+                const country = await window.detectCountry();
+                if (country) {
+                    localStorage.setItem('preferredCountry', country);
+                }
+            } catch (error) {
+                console.warn('Failed to save country to localStorage', error);
+            }
+        }
     });
 
     // Expose functions globally
     window.setLanguage = setLanguage;
-    window.getCurrentLanguage = function() {
-        return localStorage.getItem('preferredLanguage') || detectUserLanguage();
+    window.getCurrentLanguage = async function() {
+        const country = localStorage.getItem('preferredCountry');
+        if (country && window.getLanguageFromCountry) {
+            return window.getLanguageFromCountry(country);
+        }
+        return localStorage.getItem('preferredLanguage') || await detectUserLanguage();
     };
     window.detectUserLanguage = detectUserLanguage;
 })();
