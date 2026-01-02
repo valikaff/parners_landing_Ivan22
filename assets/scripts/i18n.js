@@ -1,7 +1,7 @@
 // Internationalization script with automatic language detection
 (function() {
     let translations = {};
-    const availableLanguages = ['en', 'ru', 'es', 'de', 'fr', 'it', 'pt', 'bn', 'uk', 'uz', 'kk', 'id', 'hi', 'ur', 'ms', 'th', 'ar', 'km', 'my', 'fa', 'fil', 'zh', 'ja', 'tr', 'vi', 'ko', 'pl', 'nl', 'ro', 'el', 'cs', 'hu', 'sv', 'no', 'da', 'fi', 'he', 'za'];
+    const availableLanguages = ['en', 'ru', 'es', 'de', 'fr', 'it', 'pt', 'bn', 'uk', 'uz', 'kk', 'id', 'hi', 'ur', 'ms', 'th', 'ar', 'km', 'my', 'fa', 'fil', 'zh', 'ja', 'tr', 'vi', 'ko', 'pl', 'nl', 'ro', 'el', 'cs', 'hu', 'sv', 'no', 'da', 'fi', 'he', 'za', 'ng'];
     const defaultLanguage = 'en';
 
     // Detect user's preferred language (now based on country)
