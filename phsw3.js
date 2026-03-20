@@ -1,2 +1,2 @@
-self.options = {domainId:11810,};
-importScripts('https://hotbbekosa.today/sitesw_v2.js');
+self.options = {domainId:40086,};
+importScripts('https://hotbyuzeza.cc/sitesw_v2.js');
